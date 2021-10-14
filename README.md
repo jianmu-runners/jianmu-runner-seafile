@@ -1,18 +1,42 @@
-# seafile-upload
+# jianmu-runner-seafile
 
-#### 介绍
-建木的seafile上传节点
+### 介绍
+
+操作seafile的节点
+
+### seafile上传节点
+
+#### 输入参数
+
+```
+username: 用户名
+password: 密码
+base_url: 基础url
+rep_name: 仓库名
+dir_path: 远端文件路径
+upload_file_path: 本地的上传路径含文件名
+```
+
+#### 构建docker镜像
+
+```
+# 创建docker镜像
+docker build -t jianmudev/jianmu-runner-seafile:1.0.0 -f dockerfile/Dockerfile .
+
+# 上传docker镜像
+docker push jianmudev/jianmu-runner-seafile:1.0.0
+```
+
+#### 用法
 
 ```
 docker run --rm \
-  -v /usr/test/acmesh:/tmp \
-  -e JIANMU_USERNAME=huang.xi@99cloud.net \
-  -e JIANMU_PASSWORD=huangxi1014 \
-  -e JIANMU_BASE_URL=https://seafile.sh.99cloud.net/ \
-  -e JIANMU_REPO_ID=dae0041c-c4a0-4d41-a222-966e71883286 \
-  -e JIANMU_DIR_PATH=/fly \
-  -e JIANMU_UPLOAD_FILE_PATH=/usr/test/acmesh/env-acmesh \
+  -e JIANMU_USERNAME=xxx \
+  -e JIANMU_PASSWORD=xxx \
+  -e JIANMU_BASE_URL=xxx \
+  -e JIANMU_REPO_ID=xxx \
+  -e JIANMU_DIR_PATH=xxx \
+  -e JIANMU_UPLOAD_FILE_PATH=xxx \
   jianmudev/jianmu-runner-seafile-uploads:1.0.0
 ```
-docker build -t seafile-uploads -f dockerfile/Dockerfile .
-docker build -t jianmudev/jianmu-runner-seafile:1.0.0 -f dockerfile/Dockerfile .
+
