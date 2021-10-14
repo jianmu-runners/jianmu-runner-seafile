@@ -13,7 +13,7 @@ username: 用户名
 password: 密码
 base_url: 基础url
 rep_name: 仓库名
-dir_path: 远端文件路径
+dir_id: 远端文件路径
 upload_file_path: 本地的上传路径含文件名
 ```
 
