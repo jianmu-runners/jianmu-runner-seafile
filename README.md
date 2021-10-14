@@ -2,9 +2,9 @@
 
 ### 介绍
 
-操作seafile的节点
+操作seafile
 
-### seafile上传节点
+### seafile文件上传
 
 #### 输入参数
 
@@ -12,9 +12,15 @@
 username: 用户名
 password: 密码
 base_url: 基础url
-rep_name: 仓库名
-dir_id: 远端文件路径
+repo_id: 仓库名
+dir_path: 远端文件路径
 upload_file_path: 本地的上传路径含文件名
+```
+
+#### 输出参数
+
+```
+remote_file_url: seafile中文件路径
 ```
 
 #### 构建docker镜像
