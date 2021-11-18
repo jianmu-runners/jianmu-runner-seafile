@@ -1,37 +1,37 @@
 ref: seafile_upload
-version: 1.0.0
+version: 1.0.1
 resultFile: /tmp/resultFile
 inputParameters:
   - name: 用户名
     ref: username
     type: SECRET
-    value: ""
     description: seafile用户名
+    required: true
   - name: 密码
     ref: password
     type: SECRET
-    value: ""
     description: seafile密码
+    required: true
   - name: seafile引擎
     ref: base_url
     type: STRING
-    value: "https://seafile.sh.99cloud.net/"
     description: 用于指定向哪一种seafile引擎上传文件
+    required: true
   - name: 仓库id
     ref: repo_id
     type: STRING
-    value: ""
     description: 指定仓库id，用于向特定的仓库上传文件
+    required: true
   - name: 文件路径
     ref: dir_path
     type: STRING
-    value: "/"
     description: 指定上传文件的特定路径，层级关系为：仓库/文件路径
+    required: true
   - name: 本地上传路径
     ref: upload_file_path
     type: STRING
-    value: ""
     description: 本地的上传路径，指定本地上传的文件，含文件名
+    required: true
 outputParameters:
   - name: 上传成功的路径
     ref: remote_file_url
