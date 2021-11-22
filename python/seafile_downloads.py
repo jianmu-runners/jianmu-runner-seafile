@@ -8,7 +8,7 @@ username = os.getenv("JIANMU_USERNAME")
 password = os.getenv("JIANMU_PASSWORD")
 base_url = os.getenv("JIANMU_BASE_URL")
 repo_id = os.getenv("JIANMU_REPO_ID")
-download_dir_path = os.getenv("DOWNLOAD_DIR_PATH")
+download_dir_path = os.getenv("JIANMU_DOWNLOAD_DIR_PATH")
 share_dir = os.getenv("JM_SHARE_DIR")
 
 if not (base_url.endswith("/")):

@@ -15,12 +15,12 @@ inputParameters:
   - name: seafile引擎
     ref: base_url
     type: STRING
-    description: 用于指定向哪一种seafile引擎上传文件
+    description: 用于指定向哪一种seafile引擎下载文件
     required: true
   - name: 仓库id
     ref: repo_id
     type: STRING
-    description: 指定仓库id，用于向特定的仓库上传文件
+    description: 指定仓库id，用于向特定的仓库下载文件
     required: true
   - name: 远端要下载文件的路径
     ref: download_dir_path
