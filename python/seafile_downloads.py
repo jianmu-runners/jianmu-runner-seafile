@@ -60,4 +60,5 @@ with open(file_name, "wb") as code:
 shutil.move("./" + file_name, share_dir)
 
 resultJson = "{\"download_file_path\" : \"" + share_dir + "/" + file_name + "\"}"
+print("local_path: ")
 print(resultJson)
