@@ -1,5 +1,5 @@
-ref: seafile_upload
-version: 1.0.1
+ref: seafile_download
+version: 1.0.0
 resultFile: /tmp/resultFile
 inputParameters:
   - name: 用户名
@@ -22,22 +22,17 @@ inputParameters:
     type: STRING
     description: 指定仓库id，用于向特定的仓库上传文件
     required: true
-  - name: 文件路径
-    ref: dir_path
+  - name: 远端要下载文件的路径
+    ref: download_dir_path
     type: STRING
-    description: 指定上传文件的特定路径，层级关系为：仓库/文件路径
-    required: true
-  - name: 本地上传路径
-    ref: upload_file_path
-    type: STRING
-    description: 本地的上传路径，指定本地上传的文件，含文件名
+    description: 指定下载文件的特定路径，层级关系为：仓库/文件路径
     required: true
 outputParameters:
-  - name: 上传成功的路径
-    ref: remote_file_url
+  - name: 下载成功后文件路径
+    ref: download_file_path
     type: STRING
-    description: 文件上传成功后，远端seafile引擎中的路径
+    description: 文件下载成功后，本地文件路径
     required: true
 spec:
   image: 'jianmudev/jianmu-runner-seafile:1.0.0'
-  cmd: ['/usr/local/bin/seafile_uploads.py']
+  cmd: ['/usr/local/bin/seafile_downloads.py']
