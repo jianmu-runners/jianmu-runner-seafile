@@ -1,5 +1,5 @@
 ref: seafile_upload
-version: 1.0.1
+version: 1.0.2
 resultFile: /tmp/resultFile
 inputParameters:
   - name: 用户名
@@ -39,5 +39,5 @@ outputParameters:
     description: 文件上传成功后，远端seafile引擎中的路径
     required: true
 spec:
-  image: 'jianmudev/jianmu-runner-seafile:1.0.0'
+  image: 'jianmudev/jianmu-runner-seafile:1.1.0'
   cmd: ['/usr/local/bin/seafile_uploads.py']

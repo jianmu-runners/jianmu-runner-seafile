@@ -34,5 +34,5 @@ outputParameters:
     description: 文件下载成功后，本地文件路径
     required: true
 spec:
-  image: 'jianmudev/jianmu-runner-seafile:1.0.0'
+  image: 'jianmudev/jianmu-runner-seafile:1.1.0'
   cmd: ['/usr/local/bin/seafile_downloads.py']
