@@ -58,10 +58,10 @@ with open(file_name, "wb") as code:
 
 shutil.move("./" + file_name, share_dir)
 
-fp = open(share_dir + '/pom.xml', 'r')
-content = fp.readlines()
-print(content)
-
+# 处理返回结果
 resultJson = "{\n\t\"download_file_path\" : \"" + share_dir + "/" + file_name + "\"\n}"
+resultFile = open('/tmp/downloadResultFile', 'w', encoding='utf-8')
+resultFile.write(resultJson)
+resultFile.close()
 print(resultJson)
 

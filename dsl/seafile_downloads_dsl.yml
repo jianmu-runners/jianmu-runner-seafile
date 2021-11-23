@@ -1,6 +1,6 @@
 ref: seafile_download
 version: 1.0.0
-resultFile: /tmp/resultFile
+resultFile: /tmp/downloadResultFile
 inputParameters:
   - name: 用户名
     ref: username
