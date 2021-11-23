@@ -14,7 +14,6 @@ if not (base_url.endswith("/")):
     base_url = base_url + "/"
 
 # 获取用户的token
-# curl -d "username=huang.xi@99cloud.net&password=huangxi1014" https://seafile.sh.99cloud.net/api2/auth-token/
 acquire_token_data = {"username": username,
                       "password": password}
 try:
@@ -26,7 +25,6 @@ except Exception as e:
 token = response.text[10:50]
 
 # 获得上传链接
-# curl -H "Authorization: Token 4ca89a3b16291a8d8d6170e0a63b12f8d2356ac3" https://seafile.sh.99cloud.net/api2/repos/5066b940-2fc3-4da2-9da2-d8ec301020d9/upload-link/
 get_upload_link_headers = {
     'Authorization': 'Token ' + token
 }
@@ -41,7 +39,6 @@ except Exception as e:
 upload_link = response.text.replace("\"", "")
 
 # 执行上传
-# curl -H "Authorization: Token 4ca89a3b16291a8d8d6170e0a63b12f8d2356ac3" -F file=@Dockerfile_aliyun -F filename=Dockerfile_aliyun -F parent_dir=/fly https://seafile.sh.99cloud.net/seafhttp/upload-api/e639c020-d548-45d7-bcc0-8b0936002187
 upload_file_headers = {
     'Authorization': 'Token ' + token
 }
