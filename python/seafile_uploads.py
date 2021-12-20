@@ -84,6 +84,7 @@ except Exception as e:
 # 更新成功
 if not response.status_code == 441:
     handleResult(response)
+    exit(0)
 
 # 更新失败，进行上传操作
 # 获得上传链接
