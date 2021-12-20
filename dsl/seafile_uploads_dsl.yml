@@ -1,5 +1,5 @@
 ref: seafile_upload
-version: 1.0.2
+version: 1.0.3
 resultFile: /tmp/resultFile
 inputParameters:
   - name: 用户名
