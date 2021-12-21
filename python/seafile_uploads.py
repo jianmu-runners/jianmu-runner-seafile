@@ -1,7 +1,8 @@
 import json
-import sys
-import requests
 import os
+import sys
+
+import requests
 
 username = os.getenv("JIANMU_USERNAME")
 password = os.getenv("JIANMU_PASSWORD")
@@ -11,9 +12,16 @@ dir_path = os.getenv("JIANMU_DIR_PATH")
 upload_file_path = os.getenv("JIANMU_UPLOAD_FILE_PATH")
 
 # 对输入参数进行一些前置操作
+if upload_file_path.endswith("/"):
+    upload_file_path = upload_file_path.rstrip("/")
 upload_file_name = upload_file_path.split("/")[-1]
 if not (base_url.endswith("/")):
     base_url = base_url + "/"
+if not (dir_path.startswith("/")):
+    dir_path = "/" + dir_path
+if (dir_path.endswith("/")):
+    dir_path = dir_path.rstrip("/")
+
 
 # 获取用户的token
 acquire_token_data = {"username": username,
@@ -31,17 +39,27 @@ headers = {
     'Authorization': 'Token ' + token
 }
 
-# 处理返回结果
-def handleResult(response):
-    # 生成结果文件
+
+def generateRemoteFileUrl():
+    """生成远端服务器上传的文件地址"""
+    if os.path.isdir(upload_file_path):
+        remote_file_url = base_url + "#my-libs/lib/" + repo_id + dir_path + upload_file_path
+    else:
+        remote_file_url = base_url + "lib/" + repo_id + "/file" + dir_path + "/" + upload_file_name
+    return remote_file_url
+
+def generateResultFile():
+    """生成结果文件"""
+    remote_file_url = generateRemoteFileUrl()
     resultFile = open('/tmp/resultFile', 'w', encoding='utf-8')
-    lstrip_dir_path = dir_path.rstrip("/")
-    remote_file_url = base_url + "lib/" + repo_id + "/file" + lstrip_dir_path + "/" + upload_file_name
     result = "{\n\t\"remote_file_url\" : \"" + remote_file_url + "\"\n}"
     resultFile.write(result)
     resultFile.close()
 
-    # 打印结果日志
+
+def printResultLog(response):
+    """打印结果日志"""
+    remote_file_url = generateRemoteFileUrl()
     resultJson = {
         "remote_file_url": remote_file_url.__str__(),
         "upload_link": response.url.__str__(),
@@ -53,6 +71,7 @@ def handleResult(response):
     print("response: ")
     print(json.dumps(resultJson, sort_keys=True, indent=2) + "")
     # resultJson ="{\"remote_file_url\" : \""+ remote_file_url +"\"}"
+
 
 def update():
     """以下是执行更新操作"""
@@ -67,7 +86,7 @@ def update():
     update_link = response.text.replace("\"", "")
 
     # 执行更新
-    update_dir_path = dir_path + upload_file_name if dir_path.endswith("/") else dir_path + "/" +upload_file_name
+    update_dir_path = dir_path + "/" + upload_file_name
 
     files = {
         'file': (upload_file_name, open(upload_file_path, 'rb')),
@@ -82,11 +101,13 @@ def update():
 
     # 更新成功
     if not response.status_code == 441:
-        handleResult(response)
+        printResultLog(response)
+        generateResultFile()
         exit(0)
 
-def upload():
-    """以下是执行上传操作"""
+
+def upload(upload_file_name, upload_file_path, dir_path):
+    """以下是执行上传单个文件操作"""
     # 获得上传链接
     try:
         response = requests.get(base_url + 'api2/repos/' + repo_id + '/upload-link/',
@@ -104,16 +125,80 @@ def upload():
             'parent_dir': (None, dir_path)
         }
         response = requests.post(upload_link, headers=headers, files=files)
-        handleResult(response)
+        printResultLog(response)
     except Exception as e:
         print("请求失败，请检查参数后重试。具体错误信息：", e)
         sys.exit(1)
 
-def batchUpload():
-    """以下是执行批量上传操作"""
-    pass
 
-# 上传之前，尝试更新文件，更新成功即成功覆盖源文件。更新失败执行上传操作
-update()
-# 更新失败，进行上传操作
-upload()
+def createDir(create_dir_path):
+    """执行创建文件夹的操作"""
+    params = (
+        ('p', create_dir_path),
+    )
+    data = {
+        'operation': 'mkdir'
+    }
+    try:
+        response = requests.post(base_url + 'api2/repos/' + repo_id + '/dir/', headers=headers, params=params,
+                                 data=data)
+    except Exception as e:
+        print("请求失败，请检查参数后重试。具体错误信息：", e)
+        sys.exit(1)
+    if not response.status_code == 201:
+        print("请求失败，具体错误信息：" + response.text)
+
+def widelyUpload(path):
+    """宽泛的上传函数，既可以创建文件夹，也可以上传文件"""
+    if os.path.isdir(path):
+        # 发送请求，创建文件夹
+        createDir(dir_path + path)
+    else:
+        # 发送请求，上传文件
+        upload_file_name = path.split("/")[-1]
+        local_dir_path = os.path.dirname(path)
+        upload(upload_file_name, path, dir_path + local_dir_path)
+
+
+def pre_files(path):
+    """前序遍历，遍历文件树"""
+    # 执行上传操作
+    widelyUpload(path)
+    # 遍历当前目录所有文件及文件夹
+    if os.path.isdir(path):
+        file_list = os.listdir(path)
+        # 准备循环判断每个元素是文件夹还是文件，是文件的话，上传，是文件夹的话，递归
+        for file in file_list:
+            # 利用os.path.join()方法取得路径全名，并存入cur_path变量，否则每次只能遍历一层目录
+            cur_path = os.path.join(path, file)
+            pre_files(cur_path)
+
+
+def batchUpload(upload_file_path):
+    """以下是执行批量上传操作"""
+    path_list = upload_file_path.split("/")
+    path_list.remove("")
+    cur_dir = ""
+    # 创建前置文件夹
+    for i in range(len(path_list) - 1):
+        cur_dir = cur_dir + "/" + path_list[i]
+        createDir(dir_path + cur_dir)
+
+    pre_files(upload_file_path)
+
+
+if not os.path.isdir(upload_file_path) and not os.path.isfile(upload_file_path):
+    print("请配置正确的文件/文件夹路径")
+    exit(1)
+
+# 上传文件
+if os.path.isfile(upload_file_path):
+    # 上传之前，尝试更新文件，更新成功即成功覆盖源文件。更新失败执行上传操作
+    update()
+    # 更新失败，进行上传操作
+    upload(upload_file_name, upload_file_path, dir_path)
+    generateResultFile()
+else:
+    # 批量上传文件
+    batchUpload(upload_file_path)
+    generateResultFile()
