@@ -145,6 +145,7 @@ def deleteDir(delete_dir_path):
         print("请求失败，请检查参数后重试。具体错误信息：", e)
         sys.exit(1)
 
+
 def existDir(path):
     """是否存在此文件夹"""
     parent_path = os.path.dirname(path)
@@ -159,6 +160,7 @@ def existDir(path):
         if path_name == response.json()[i]["name"]:
             return True
     return False
+
 
 def createDir(create_dir_path):
     """执行创建文件夹的操作"""
@@ -180,6 +182,7 @@ def createDir(create_dir_path):
         sys.exit(1)
     if not response.status_code == 201:
         print("请求失败，具体错误信息：" + response.text)
+
 
 def widelyUpload(path):
     """宽泛的上传函数，既可以创建文件夹，也可以上传文件"""
