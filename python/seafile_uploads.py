@@ -4,6 +4,7 @@ import sys
 
 import requests
 
+cover_flag = os.getenv("JIANMU_COVER_FLAG")
 username = os.getenv("JIANMU_USERNAME")
 password = os.getenv("JIANMU_PASSWORD")
 base_url = os.getenv("JIANMU_BASE_URL")
@@ -15,13 +16,13 @@ upload_file_path = os.getenv("JIANMU_UPLOAD_FILE_PATH")
 if upload_file_path.endswith("/"):
     upload_file_path = upload_file_path.rstrip("/")
 upload_file_name = upload_file_path.split("/")[-1]
+upload_parent_dir = upload_file_path.split("/")[1]
 if not (base_url.endswith("/")):
     base_url = base_url + "/"
 if not (dir_path.startswith("/")):
     dir_path = "/" + dir_path
 if (dir_path.endswith("/")):
     dir_path = dir_path.rstrip("/")
-
 
 # 获取用户的token
 acquire_token_data = {"username": username,
@@ -47,6 +48,7 @@ def generateRemoteFileUrl():
     else:
         remote_file_url = base_url + "lib/" + repo_id + "/file" + dir_path + "/" + upload_file_name
     return remote_file_url
+
 
 def generateResultFile():
     """生成结果文件"""
@@ -104,6 +106,7 @@ def update():
         printResultLog(response)
         generateResultFile()
         exit(0)
+    print("更新文件失败，将上传此文件")
 
 
 def upload(upload_file_name, upload_file_path, dir_path):
@@ -131,6 +134,18 @@ def upload(upload_file_name, upload_file_path, dir_path):
         sys.exit(1)
 
 
+def deleteDir(delete_dir_path):
+    params = (
+        ('p', delete_dir_path),
+    )
+    try:
+        requests.delete(base_url + 'api2/repos/' + repo_id + '/dir/',
+                        headers=headers, params=params)
+    except Exception as e:
+        print("请求失败，请检查参数后重试。具体错误信息：", e)
+        sys.exit(1)
+
+
 def createDir(create_dir_path):
     """执行创建文件夹的操作"""
     params = (
@@ -147,6 +162,7 @@ def createDir(create_dir_path):
         sys.exit(1)
     if not response.status_code == 201:
         print("请求失败，具体错误信息：" + response.text)
+
 
 def widelyUpload(path):
     """宽泛的上传函数，既可以创建文件夹，也可以上传文件"""
@@ -193,12 +209,23 @@ if not os.path.isdir(upload_file_path) and not os.path.isfile(upload_file_path):
 
 # 上传文件
 if os.path.isfile(upload_file_path):
-    # 上传之前，尝试更新文件，更新成功即成功覆盖源文件。更新失败执行上传操作
-    update()
-    # 更新失败，进行上传操作
-    upload(upload_file_name, upload_file_path, dir_path)
-    generateResultFile()
+    # 更新文件，更新成功即成功覆盖源文件。若更新失败执行上传操作
+    if cover_flag == "true":
+        update()
+        upload(upload_file_name, upload_file_path, dir_path)
+        generateResultFile()
+    else:
+        # 直接执行上传操作
+        upload(upload_file_name, upload_file_path, dir_path)
+        generateResultFile()
 else:
-    # 批量上传文件
-    batchUpload(upload_file_path)
-    generateResultFile()
+    if cover_flag == "true":
+        # 尝试删除
+        deleteDir(dir_path + "/" + upload_parent_dir)
+        # 执行批量上传
+        batchUpload(upload_file_path)
+        generateResultFile()
+    else:
+        # 批量上传文件
+        batchUpload(upload_file_path)
+        generateResultFile()
