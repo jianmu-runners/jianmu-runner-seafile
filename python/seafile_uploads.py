@@ -42,7 +42,7 @@ headers = {
 
 
 def generateRemoteFileUrl():
-    """生成远端服务器上传的文件地址"""
+    """生成远端服务器已上传文件的地址"""
     if os.path.isdir(upload_file_path):
         remote_file_url = base_url + "#my-libs/lib/" + repo_id + dir_path + upload_file_path
     else:
@@ -145,9 +145,27 @@ def deleteDir(delete_dir_path):
         print("请求失败，请检查参数后重试。具体错误信息：", e)
         sys.exit(1)
 
+def existDir(path):
+    """是否存在此文件夹"""
+    parent_path = os.path.dirname(path)
+    path_name = path.split("/")[-1]
+    params = (
+        ('p', parent_path),
+    )
+    response = requests.get(base_url + 'api2/repos/' + repo_id + '/dir/',
+                            headers=headers, params=params)
+
+    for i in range(len(response.json())):
+        if path_name == response.json()[i]["name"]:
+            return True
+    return False
 
 def createDir(create_dir_path):
     """执行创建文件夹的操作"""
+    # 创建文件夹之前判断一下，文件夹是否存在
+    if existDir(create_dir_path):
+        return
+
     params = (
         ('p', create_dir_path),
     )
@@ -162,7 +180,6 @@ def createDir(create_dir_path):
         sys.exit(1)
     if not response.status_code == 201:
         print("请求失败，具体错误信息：" + response.text)
-
 
 def widelyUpload(path):
     """宽泛的上传函数，既可以创建文件夹，也可以上传文件"""
