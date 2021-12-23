@@ -157,7 +157,7 @@ def existDir(path):
                             headers=headers, params=params)
 
     for i in range(len(response.json())):
-        if path_name == response.json()[i]["name"]:
+        if path_name == response.json()[i]["name"] and response.json()[i]["type"] == "dir":
             return True
     return False
 
