@@ -60,6 +60,7 @@ def zip_decompress(file_path, new_path):
     pre_files(share_dir + "/" + rename_dir)
     os.remove(file_path)
 
+
 def pre_files(path):
     """前序遍历，遍历文件树"""
     # 执行重命名操作
@@ -110,7 +111,7 @@ def singleFileDownload(download_dir_path):
     with open(share_dir + "/" + file_name, "wb") as code:
         code.write(response.content)
 
-    generateResult(file_name)
+    generateResult(file_name + ".zip")
     sys.exit(0)
 
 
