@@ -1,6 +1,7 @@
 ref: seafile_download
 version: 1.1.0
 resultFile: /tmp/downloadResultFile
+description: 此版本支持批量下载，只需要在download_dir_path指定文件夹即可
 inputParameters:
   - name: 用户名
     ref: username
