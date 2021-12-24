@@ -45,18 +45,40 @@ def generateResult(download_result):
     print(resultJson)
 
 
-def unzip_file(zip_src):
-    """解压文件"""
-    r = zipfile.is_zipfile(zip_src)
-    dst_dir = zip_src.rstrip(".zip")
-    if r:
-        fz = zipfile.ZipFile(zip_src, 'r')
-        for file in fz.namelist():
-            fz.extract(file, dst_dir)
-        fz.close()
-        os.remove(zip_src)
-    else:
-        print('This is not zip')
+def zip_decompress(file_path, new_path):
+    """
+    支持中文的解压缩程序
+    file_path：原zip文件路径
+    new_path：新文件夹路径
+    """
+    z = zipfile.ZipFile(f'{file_path}', 'r')
+    z.extractall(path=f"{new_path}")
+    # 得到压缩包里所有文件
+    zip_list = z.namelist()
+    rename_dir = zip_list[0].split("/")[0]
+    z.close()
+    pre_files(share_dir + "/" + rename_dir)
+    os.remove(file_path)
+
+def pre_files(path):
+    """前序遍历，遍历文件树"""
+    # 执行重命名操作
+    parent_dir = os.path.dirname(path)
+    path_name = path.split("/")[-1]
+    new_file_name = ""
+    try:
+        new_file_name = path_name.encode('cp437').decode('utf-8')
+        os.rename(os.path.join(parent_dir, path_name), os.path.join(parent_dir, new_file_name))
+    except:
+        pass
+    # 遍历当前目录所有文件及文件夹
+    if os.path.isdir(parent_dir + "/" + new_file_name):
+        file_list = os.listdir(parent_dir + "/" + new_file_name)
+        # 准备循环判断每个元素是文件夹还是文件，是文件的话，更名，是文件夹的话，更名并递归
+        for file in file_list:
+            # 利用os.path.join()方法取得路径全名，并存入cur_path变量，否则每次只能遍历一层目录
+            cur_path = os.path.join(parent_dir + "/" + new_file_name, file)
+            pre_files(cur_path)
 
 
 def singleFileDownload(download_dir_path):
@@ -85,11 +107,12 @@ def singleFileDownload(download_dir_path):
         sys.exit(1)
 
     # 写入硬盘
-    with open(share_dir + file_name, "wb") as code:
+    with open(share_dir + "/" + file_name, "wb") as code:
         code.write(response.content)
 
     generateResult(file_name)
     sys.exit(0)
+
 
 def judgePathType(path):
     """判断文件类型"""
@@ -109,13 +132,14 @@ def judgePathType(path):
     print("[ERROR] Please configure the correct file path")
     sys.exit(1)
 
+
 def batchDownload(download_dir_path):
     """批量下载"""
-    dir_name = download_dir_path.split("/")[-1]
+    dir_name = "/" + download_dir_path.split("/")[-1]
     parent_dir = os.path.dirname(download_dir_path)
     params = (
         ('parent_dir', parent_dir),
-        ('dirents', "/" + dir_name),
+        ('dirents', dir_name),
     )
     response = requests.get(base_url + 'api/v2.1/repos/' + repo_id + '/zip-task/',
                             headers=headers, params=params)
@@ -127,10 +151,11 @@ def batchDownload(download_dir_path):
     with open(share_dir + dir_name + ".zip", "wb") as code:
         code.write(response.content)
 
-    unzip_file(share_dir + dir_name + ".zip")
+    zip_decompress(share_dir + dir_name + ".zip", share_dir)
 
-    generateResult(dir_name)
+    generateResult(dir_name.lstrip("/"))
     exit(0)
+
 
 file_type = judgePathType(download_dir_path)
 if file_type == "dir":
