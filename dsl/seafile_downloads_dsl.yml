@@ -1,5 +1,5 @@
 ref: seafile_download
-version: 1.0.0
+version: 1.1.0
 resultFile: /tmp/downloadResultFile
 inputParameters:
   - name: 用户名
@@ -25,7 +25,7 @@ inputParameters:
   - name: 远端要下载文件的路径
     ref: download_dir_path
     type: STRING
-    description: 指定下载文件的特定路径，层级关系为：仓库/文件路径
+    description: 指定下载文件/文件夹的特定路径，层级关系为：仓库/文件路径
     required: true
 outputParameters:
   - name: 下载成功后文件路径
@@ -34,5 +34,5 @@ outputParameters:
     description: 文件下载成功后，本地文件路径
     required: true
 spec:
-  image: 'jianmudev/jianmu-runner-seafile:1.1.0'
+  image: 'huangxi1020/jianmu-runner-seafile:1.3.0'
   cmd: ['/usr/local/bin/seafile_downloads.py']

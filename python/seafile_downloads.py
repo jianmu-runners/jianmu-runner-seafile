@@ -151,7 +151,7 @@ def batchDownload(download_dir_path):
     with open(share_dir + dir_name + ".zip", "wb") as code:
         code.write(response.content)
 
-    zip_decompress(share_dir + dir_name + ".zip", share_dir)
+    # zip_decompress(share_dir + dir_name + ".zip", share_dir)
 
     generateResult(dir_name.lstrip("/"))
     exit(0)
